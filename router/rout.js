@@ -8,17 +8,17 @@ const {
   replaceStaff,
 } = require("../controller/controller");
 
-const validator = require("../controller/validator.js");
+const staffValidator = require("../controller/validator.js");
 
 const router = require("express").Router();
 
-router.post("/createstaffinfo", validator, createStaff);
+router.post("/createstaffinfo", staffValidator(true), createStaff);
 
 router.get("/allstaff", getAllStaffInfo);
 
 router.get("/staffinformation/:id", getStaffInfo);
 
-router.put("/updateinfo/:id", validator, updateStaffInfo);
+router.put("/updateinfo/:id", staffValidator(false), updateStaffInfo);
 
 router.post("/login", login);
 

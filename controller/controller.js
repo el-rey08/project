@@ -95,7 +95,11 @@ exports.updateStaffInfo = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const staff = await StaffModel.findOne({ email: email });
+    const data = {
+      email,
+      password
+    }
+    const staff = await StaffModel.findOne(data,{ email,password });
 
     if (!staff) {
       return res.status(400).json("invalid Email");
@@ -121,12 +125,13 @@ exports.login = async (req, res) => {
 //checking out time
 exports.logout = async (req, res) => {
   try {
-    const { email } = req.body;
+    const {fullname, email ,password} = req.body;
     const data = {
+      fullname,
       email,
+      password
     };
-
-    const staff = await StaffModel.findOne(data, { email });
+    const staff = await StaffModel.findOne(data, { fullname, email  ,password});
     const date = new Date().toLocaleDateString();
     const time = new Date().toLocaleTimeString();
     staff.logOutTime = `${date}, ${time}`;

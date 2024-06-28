@@ -1,6 +1,6 @@
 const joiValidator=require("@hapi/joi")
-const validator =async(req,res,next)=>{
- const schema = joiValidator.object({
+
+ const schemas ={
     fullname:joiValidator
     .string()
     .required()
@@ -55,9 +55,37 @@ const validator =async(req,res,next)=>{
     stateOfOrigin:joiValidator
     .string()
     .required()
-    .regex(/^[A-Za-z]+$/),
- })
- const {error}= await schema.validate(req.body)
-     return error? res.status(400).json(error.details[0].message):next()
+    .regex(/^[A-Za-z]+$/)
+    .messages({
+      'string.pattern.base':'state of origin should be in alphabet'
+    }),
+ }
+ 
+ const staffEntryValidator = (validateAllFields = false) => {
+  return async (req, res, next) => {
+      const keysToValidate = {};
+
+      if (validateAllFields) {
+          Object.keys(schemas).forEach((key) => {
+              keysToValidate[key] = schemas[key].required();
+          });
+      } else {
+          Object.keys(req.body).forEach((key) => {
+              if (schemas[key]) {
+                  keysToValidate[key] = schemas[key];
+              }
+          });
+      }
+      const schema = joiValidator.object(keysToValidate);
+
+      const { error } = schema.validate(req.body);
+
+      if (error) {
+          return res.status(400).json(error.details[0].message);
+      } else {
+          return next();
+      }
+  };
 }
-module.exports = validator
+
+module.exports = staffEntryValidator
